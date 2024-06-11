@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: lightskyblue;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(0, 212, 227, 0.822);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            margin-top: 20px;
+        }
+        h2 {
+            color: #131313;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        p {
+            color: #131313;
+            font-size: 18px;
+        }
+        .user-input {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .user-input label {
+            margin-right: 10px;
+        }
+        .user-input input[type="number"] {
+            width: 100px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .weather-info {
+            margin-top: 20px;
+        }
+        .weather-info p {
+            margin: 5px;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            display: none;
+            font-size: 18px; 
+        }
+        #search-button {
+            padding: 8px 20px; /* Add padding to match input field */
+            border: none;
+            background-color: #4ca0af;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+       }
+
+        #search-button:hover {
+            background-color: #4ca0af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome to Weather Dashboard!</h2>
+        <div class="user-input">
+            <label for="latitude">Latitude:</label>
+            <input type="number" id="latitude" placeholder="Enter latitude">
+            <label for="longitude">Longitude:</label>
+            <input type="number" id="longitude" placeholder="Enter longitude">
+            <button id="search-button">Search</button>
+        </div>
+        <div class="weather-info">
+            <p id="location"></p>
+            <p id="temperature"></p>
+            <p id="description"></p>
+        </div>
+        <p class="error-message" id="error-message">Something went wrong. Please try again.</p>
+    </div>
+
+    <script>
+        document.getElementById('search-button').addEventListener('click', async () => {
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+
+            const apiKey = '637a1a28d49bb757210dc421bec1465e'; 
+            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayWeather(data);
+                    clearError();
+                } else {
+                    showError('No weather data available.');
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showError('Something went wrong. Please try again.');
+            }
+        });
+
+        function displayWeather(weatherData) {
+            const location = document.getElementById('location');
+            const temperature = document.getElementById('temperature');
+            const description = document.getElementById('description');
+
+            location.textContent = `Location: ${weatherData.name}, ${weatherData.sys.country}`;
+            temperature.textContent = `Temperature: ${weatherData.main.temp}°C`;
+            description.textContent = `Description: ${weatherData.weather[0].description}`;
+        }
+
+        function showError(message) {
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.style.display = 'block';
+            errorMessage.innerText = message;
+        }
+
+        function clearError() {
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
